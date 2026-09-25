@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>Flagged | Case Study | Colin Lyons</title>
+  <meta name="description" content="UX case study for Flagged, a 2D Godot decision game where the player interviews NPCs and decides who to keep under changing daily rules.">
+  <meta name="keywords" content="Colin Lyons, Flagged, Godot, game design, UX case study, GDScript">
+  <meta name="author" content="Colin Lyons">
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Flagged | Case Study | Colin Lyons">
+  <meta property="og:description" content="A 2D Godot game where you interview NPCs and decide who to keep under changing daily rules.">
+
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="index.html#top" class="logo" aria-label="Colin Lyons, back to top"><img src="assets/CLLogo.png" style="width: 50px;"></a>
+
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle navigation menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="primary-nav" id="primaryNav">
+        <ul>
+          <li><a href="index.html#top">Home</a></li>
+          <li><a href="index.html#projects">Projects</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <a class="btn btn-outline nav-resume" href="assets/Colin-Lyons-Resume.pdf" download>Resume</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Case hero -->
+    <section class="hero case-hero">
+      <div class="wrap">
+        <a class="case-back" href="index.html#projects">&larr; Back to Projects</a>
+        <p class="case-eyebrow">Case Study</p>
+        <h1>Flagged</h1>
+        <p class="case-hero-sub">A 2D decision game built in Godot, where the player works as a screener interviewing people who walk across the screen and deciding whether to Keep or Let Go under a rules that change very day.</p>
+
+        <div>
+            <img src="assets/HFSC1.png">
+        </div>
+      </div>
+    </section>
+
+    <!-- Case body: TOC + content -->
+    <div class="wrap case-body">
+
+      <aside class="case-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#research">Research</a></li>
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#ideation">Ideation</a></li>
+          <li><a href="#prototyping">Prototyping</a></li>
+          <li><a href="#testing">Testing</a></li>
+          <li><a href="#solution">Solution</a></li>
+        </ul>
+      </aside>
+
+      <div class="case-content">
+
+        <section id="overview">
+          <h2>Project Overview</h2>
+          <p>Flagged is a 2D game where you play a screener. Every in-game day, people walk across the screen and you have to interview them and decide Keep or Let Go, based on a rule that changes each day. Get it right and you earn money, get it wrong and it costs you, and on top of that rent gets deducted when the day ends. Drop below zero and your save gets locked as a game over. Muhammad Furqan Ahmed and I built this across three iteration phases (Analysis, Design, Construction) for our INFO3190 project in March 2026.</p>
+        </section>
+
+        <section id="research">
+          <h2>User Research & Discovery</h2>
+          <p>Before starting I wanted to know if this kind of game still had an audience. Papers, Please is over a decade old at this point but games are still coming out in the same genre, like No, I'm Not a Human, so clearly people are still into it.</p>
+          <p>I played through both of those to see how they handled the interview/decision loop. They're both built around the same idea, inspect someone or something, then accept or reject it, and both run you through a queue with limited time per decision. What stood out to me was that in neither game do you get to pick who you inspect &mdash; that felt like the gap Flagged could fill.</p>
+          <p>Once we had the concept down we moved into the Analysis iteration. We identified the Player as the actor, the NPCs and Game System as stakeholders, and wrote out eight use cases with triggers, preconditions, flows and exceptions: New Game, Customize Character, Load Game, Delete Save, Interview NPC, Day Ends, Saves Game and Quit Game. Working through the exception cases is honestly what showed us where we needed to guard the player &mdash; things like an empty username field, an accidental delete, a corrupt save, or trying to make a decision after the day already ended.</p>
+          <div><img src="assets/UseCaseDiagram.png" style="width: 600px;"></div>
+        </section>
+
+        <section id="problem">
+          <h2>Problem Statement</h2>
+          <p>In most inspection-based decision games, you're working through a fixed queue of people or items and making calls under time pressure, but you don't actually get a say in who you inspect. I thought there was room to make it more strategic by handing that choice to the player, while keeping the hard accept-or-reject decisions and the changing rules and time pressure that make the genre work.</p>
+          <p class="case-quote">How might we let players choose who to inspect, while keeping every decision tense, timed and consequential?</p>
+        </section>
+
+        <section id="ideation">
+          <h2>Ideation</h2>
+          <p>From the problem statement and the use cases, a few interface decisions fell out pretty naturally:</p>
+          <ul class="bullet-list">
+            <li>People walk across the screen instead of sitting in a queue, and you click whoever you want to interview. If someone walks off the screen without being inspected they count as missed, but you only get penalized if they should've been kept &mdash; so skipping people is a real part of the strategy, not just a fallback.</li>
+            <li>The day's rule shows up in a Day Begin message before anything starts, and the timer only kicks in once you hit Begin Day. No surprise rules mid-run.</li>
+            <li>You only ever interview one person at a time. Clicking someone freezes and hides them, pulls up the overlay, and locks out clicking on anyone else until you're done.</li>
+            <li>Info about each person comes through a phone in the interview overlay, with the apps available on it changing day to day.</li>
+          </ul>
+          <div><img src="assets/EarlySC1.png" style="width: 600px;"><img src="assets/EarlySC2.png" style="width: 600px;"><img src="assets/NavigationDiagram.png" style="width: 600px;"></div>
+        </section>
+
+        <section id="prototyping">
+          <h2>Prototyping</h2>
+          <p>Analysis gave us a barebones prototype to work off of. During Design we built that out into an actual full game loop, plus the design class diagram, design-level sequence diagrams, navigation diagram, UI prototype, output design and an entity relationship diagram. Construction is where we went back and polished the UI/UX.</p>
+          <p>For the look, I went with a minimalistic, monochrome palette &mdash; dark and light greys, black and white &mdash; so the focus stays on the people, the text and the numbers instead of on decoration.</p>
+          <div><img src="assets/HFSC1.png" style="width: 600px;"></div>
+        </section>
+
+        <section id="testing">
+          <h2>Usability Testing</h2>
+          <p>During Construction we ran the game logic through GUT (Godot Unit Test) &mdash; 38 tests total covering day data, every rule type, day loading, saving and profile serialization. All 38 passed, no defects.</p>
+          <p>Once the loop was playable we grabbed 4 classmates and had them play through the first two days with basically no instructions, just "press Start," then asked them a few questions after.</p>
+          <p>Most people got Keep and Let Go right away, but a couple weren't sure if they'd made the right call, so we ended up adding sound effects to confirm decisions. The other thing we noticed was pacing &mdash; the first days felt slow. We didn't want to speed them up too much since people still needed time to learn the loop, but once they had it down they were just standing around waiting.</p>
+          <p>To fix that we bumped up how many people show up in the first few days and lowered the penalty for wrong decisions early on, so newer players wouldn't tank their save before they'd even figured things out. Ran it again with 3 more testers afterward and nobody was confused or just waiting around anymore.</p>
+        </section>
+
+        <section id="solution">
+          <h2>Final Solution</h2>
+          <p>What we ended up with is a 6-day game that ramps up in difficulty as you go. You create or load a profile, read the day's rule, hit Begin Day, and people start walking across the screen. Click someone and the interview overlay pops up with the phone. Choose Keep or Let Go and the HUD updates right away. When the timer hits zero, rent gets applied, the day advances, and you either see your result or a game over screen. Hit Return and it saves your profile.</p>
+          <div><img src="assets/HFSC4.png" style="width: 600px;"><img src="assets/HFSC5.png" style="width: 600px;"></div>
+
+          <h3>Design Brief</h3>
+          <p>Flagged is meant to be a short, replayable session with rising tension and real consequences, where who you choose to interview is the strategy. Aimed at casual PC players who'd enjoy something like Papers, Please or No, I'm Not a Human.</p>
+          <p>For layout, people walk across the main screen while the HUD keeps day, money and time visible at all times, and interviews open in an overlay so you're only ever dealing with one person. Colour-wise it's monochrome &mdash; greys, black and white &mdash; for that minimalist urban feel that keeps the focus on people, text and numbers instead of decoration. Typography is Share Tech Mono, which fits the tone and stays readable even small.</p>
+
+          <h3>Accessibility Considerations</h3>
+          <ul class="bullet-list">
+            <li>Errors show up as both a visible message and a sound cue, and other key moments (interview opening, button clicks, game over) each get their own audio cue too.</li>
+            <li>The day's rule is always shown as on-screen text before the timer even starts.</li>
+            <li>Deleting a profile needs confirmation first, and there's a pause menu so you can stop the game whenever.</li>
+            <li>High-contrast greyscale means nothing depends on colour alone to make sense.</li>
+          </ul>
+
+          <h3>Lessons Learned</h3>
+          <p>Looking at what Papers, Please and No, I'm Not a Human didn't do was honestly the most useful part of research &mdash; that gap became the whole design. Keeping the day settings in JSON instead of hardcoding them made it way easier to tweak difficulty without touching code every time. And probably the biggest one: the rules and the interface need to be designed together, because a rule only feels fair if the player can actually read it and watch it get enforced exactly as written.</p>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year"></span> Colin Lyons</p>
+      <a href="index.html#top">Back to home &uarr;</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Highlight the active TOC link based on scroll position
+    const sections = document.querySelectorAll('.case-content section[id]');
+    const tocLinks = document.querySelectorAll('.case-toc a');
+    if (sections.length && tocLinks.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach((link) => link.classList.remove('is-active'));
+            const active = document.querySelector('.case-toc a[href="#' + entry.target.id + '"]');
+            if (active) active.classList.add('is-active');
+          }
+        });
+      }, { rootMargin: '-40% 0px -50% 0px' });
+      sections.forEach((section) => observer.observe(section));
+    }
+  </script>
+</body>
+</html>
